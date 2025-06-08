@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,6 @@ import {
 import { FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
 import useAuthStore from '~/store/AuthStore';
 import { useRouter } from 'expo-router';
-import { supabase } from '~/utils/supabase';
 
 const LoginScreen = () => {
   const { login } = useAuthStore();
@@ -21,26 +20,6 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-
-      if (error) {
-        console.error('Error fetching session:', error.message);
-        return router.navigate('/');
-      }
-
-      if (session) {
-        router.navigate('/');
-      } else {
-        router.navigate('/');
-      }
-    };
-  }, []);
 
   const router = useRouter();
 

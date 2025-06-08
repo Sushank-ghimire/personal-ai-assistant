@@ -1,45 +1,18 @@
-import { View, Text } from 'react-native';
-import useCachedResources from '~/hooks/useCachedResources';
-import useAuthStore from '~/store/AuthStore';
-import { useEffect } from 'react';
-import { supabase } from '~/utils/supabase';
+import { Stack, useRouter } from 'expo-router';
 import { Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import useAuthStore from '~/store/AuthStore';
 
 const ProtectedRouteLayout = () => {
-  const isLoadingComplete = useCachedResources();
-
-  const { setSession, logout } = useAuthStore();
-
+  const { session } = useAuthStore();
   const router = useRouter();
-
-  useEffect(() => {
-    supabase.auth
-      .refreshSession()
-      .then(async (session) => {
-        console.log('session', session);
-        setSession(session.data.session);
-        if (session.error) await logout();
-        Alert.alert('Login required', 'Your session is expired please login again', [
-          {
-            text: 'Ok',
-            onPress: () => router.push('/'),
-          },
-        ]);
-      })
-      .catch(async (error: Error) => {
-        console.log('error', error);
-        Alert.alert('Error occured', error.message);
-      });
-  }, []);
-
-  if (!isLoadingComplete) {
-    return null;
+  if (!session?.user) {
+    Alert.alert('Your session has been expired login again to continue chat with your AI ');
+    router.push('/');
   }
   return (
-    <View>
-      <Text>ProtectedRouteLayout</Text>
-    </View>
+    <Stack>
+      <Stack.Screen name="chat" options={{ title: 'Chat with your AI' }} />
+    </Stack>
   );
 };
 
