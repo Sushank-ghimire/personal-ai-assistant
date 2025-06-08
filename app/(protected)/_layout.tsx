@@ -23,7 +23,7 @@ const ProtectedRouteLayout = () => {
         Alert.alert('Login required', 'Your session is expired please login again', [
           {
             text: 'Ok',
-            onPress: () => router.push("/")
+            onPress: () => router.push('/'),
           },
         ]);
       })
@@ -32,6 +32,10 @@ const ProtectedRouteLayout = () => {
         Alert.alert('Error occured', error.message);
       });
   }, []);
+
+  if (!isLoadingComplete) {
+    return null;
+  }
   return (
     <View>
       <Text>ProtectedRouteLayout</Text>

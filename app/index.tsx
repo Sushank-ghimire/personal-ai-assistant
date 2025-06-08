@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,12 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
 import useAuthStore from '~/store/AuthStore';
-import { supabase } from '~/utils/supabase';
 import { useRouter } from 'expo-router';
+import { supabase } from '~/utils/supabase';
 
 const LoginScreen = () => {
   const { login } = useAuthStore();
@@ -21,11 +22,51 @@ const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error('Error fetching session:', error.message);
+        return router.navigate('/');
+      }
+
+      if (session) {
+        router.navigate('/');
+      } else {
+        router.navigate('/');
+      }
+    };
+  }, []);
+
   const router = useRouter();
+
+  const handleOAuthLogin = async (provider: 'google' | 'github') => {
+    Alert.alert('Currently not available updating as soon as possible');
+    return;
+    // const { error, data } = await supabase.auth.signInWithOAuth({
+    //   provider,
+    // });
+    // if (error) {
+    //   Alert.alert(`OAuth signup failed`, error.message);
+    // } else if (data?.url) {
+    //   let result = await WebBrowser.openBrowserAsync(data.url);
+    //   console.log('Data : ', data);
+    //   console.log('Browser result : ', result);
+    // }
+  };
 
   const handleLogin = async () => {
     setLoading(true);
     try {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        Alert.alert('Invalid Email', 'Please enter a valid email address.');
+        return;
+      }
       await login(email, password);
       Alert.alert('Login successful');
     } catch (error: any) {
@@ -33,17 +74,6 @@ const LoginScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleOAuthLogin = async (provider: 'google' | 'github') => {
-    const { error, data } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: '',
-      },
-    });
-    if (error) Alert.alert(`Login with ${provider} failed`, error.message);
-    console.log(data);
   };
 
   return (
@@ -92,7 +122,7 @@ const LoginScreen = () => {
             onPress={handleLogin}
             disabled={loading || !email || !password}>
             <Text className="text-center text-base font-semibold text-white">
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? <ActivityIndicator color={'white'} size={'small'} animating /> : 'Login'}
             </Text>
           </TouchableOpacity>
 
