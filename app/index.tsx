@@ -47,7 +47,12 @@ const LoginScreen = () => {
         return;
       }
       await login(email, password);
-      Alert.alert('Login successful');
+      Alert.alert('Login successful', '', [
+        {
+          text: 'Ok',
+          onPress: () => router.push('/chat'),
+        },
+      ]);
     } catch (error: any) {
       Alert.alert('Login failed', error.message || String(error));
     } finally {

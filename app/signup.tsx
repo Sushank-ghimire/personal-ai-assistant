@@ -41,6 +41,12 @@ const UserSignUp = () => {
 
       setLoading(true);
       await register(email, password);
+      Alert.alert('Signup', 'Signup Successfull', [
+        {
+          text: 'Login',
+          onPress: () => router.push('/'),
+        },
+      ]);
     } catch (error: any) {
       Alert.alert('Login failed', error.message || String(error));
     } finally {

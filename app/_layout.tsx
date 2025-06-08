@@ -19,7 +19,6 @@ export default function Layout() {
     supabase.auth
       .refreshSession()
       .then(async (session) => {
-        console.log('session', session);
         setSession(session.data.session);
         if (session.error) await logout();
         if (session.data.user) {
@@ -27,7 +26,7 @@ export default function Layout() {
         }
       })
       .catch(async (error: Error) => {
-        console.log('error', error);
+        console.log('Error', error);
         Alert.alert('Error occured', error.message);
       });
   }, []);
@@ -44,9 +43,9 @@ export default function Layout() {
           keyboardHandlingEnabled: true,
           fullScreenGestureEnabled: true,
           statusBarAnimation: 'fade',
+          animation: 'simple_push',
         }}>
         <Stack.Screen name="index" options={{ title: 'Home Screen' }} />
-        <Stack.Screen name="details" options={{ title: 'Details Screen' }} />
         <Stack.Screen name="+not-found" options={{ title: 'Notfound Screen' }} />
         <Stack.Screen name="signup" options={{ title: 'Signup Page' }} />
         <Stack.Screen name="(protected)" options={{ title: 'Protected Page' }} />
