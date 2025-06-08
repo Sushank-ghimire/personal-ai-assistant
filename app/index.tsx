@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import * as Linking from 'expo-linking';
 import {
   View,
   Text,
@@ -40,7 +39,7 @@ const LoginScreen = () => {
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: "",
+        redirectTo: '',
       },
     });
     if (error) Alert.alert(`Login with ${provider} failed`, error.message);
@@ -116,10 +115,12 @@ const LoginScreen = () => {
           </View>
 
           <View className="mt-auto flex flex-row items-center justify-center pt-4">
-            <Text className="text-center text-lg text-gray-600">Don’t have an account? </Text>{' '}
+            <Text className="text-center text-lg text-gray-600">Don’t have an account? </Text>
             <TouchableOpacity
               className="flex items-center justify-center text-center"
-              onPress={() => {}}>
+              onPress={() => {
+                router.push('/signup');
+              }}>
               <Text className="text-lg font-semibold text-indigo-600">Sign up</Text>
             </TouchableOpacity>
           </View>
