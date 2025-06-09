@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,15 +13,22 @@ import {
 import { FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
 import useAuthStore from '~/store/AuthStore';
 import { useRouter } from 'expo-router';
+import { Button } from '~/components/Button';
 
 const LoginScreen = () => {
-  const { login } = useAuthStore();
+  const { login, session } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (session?.user) {
+      router.push('/chat');
+    }
+  }, [router, session]);
 
   const handleOAuthLogin = async (provider: 'google' | 'github') => {
     Alert.alert('Currently not available updating as soon as possible');
@@ -59,6 +66,21 @@ const LoginScreen = () => {
       setLoading(false);
     }
   };
+
+  if (session?.user) {
+    return (
+      <View className="flex min-h-screen w-screen items-center justify-center px-12">
+        <Text className="mb-10 text-center text-4xl font-bold text-indigo-600">Welcome Back</Text>
+        <Button
+          onPress={() => {
+            router.push('/chat');
+          }}
+          className="w-full rounded-sm p-2 text-xl"
+          title="Chat With your AI Assistant"
+        />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView

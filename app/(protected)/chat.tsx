@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -13,10 +12,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MessageInput from '~/components/MessageInput';
 import useAuthStore from '~/store/AuthStore';
+import useVoiceInput from '~/hooks/useVoiceInput';
 
 const AskYourAI = () => {
   const router = useRouter();
   const { logout } = useAuthStore();
+
+  const { result, isListening, stopListening, startListening } = useVoiceInput();
 
   const handleLogout = async () => {
     await logout();
@@ -25,7 +27,9 @@ const AskYourAI = () => {
 
   const handleSendMessage = async () => {};
 
-  const handleVoiceInput = async () => {};
+  const handleVoiceInput = async () => {
+    await startListening();
+  };
 
   const [message, setMessage] = useState('');
 
