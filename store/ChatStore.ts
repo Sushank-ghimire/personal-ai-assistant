@@ -2,13 +2,13 @@ import { create } from 'zustand';
 import { supabase } from '~/utils/supabase';
 import OpenAI from 'openai';
 
-interface ChatHistory {
+export interface ChatHistory {
   userid: string;
   role: 'user' | 'assistant';
   content: string;
   created_at: Date;
   id: string;
-  session_id: string;
+  session_id?: string;
 }
 
 const openai = new OpenAI({

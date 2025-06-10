@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  Alert,
+  FlatList,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -14,6 +16,8 @@ import MessageInput from '~/components/MessageInput';
 import useAuthStore from '~/store/AuthStore';
 import { useVoiceRecognition } from '~/hooks/useVoiceInput';
 import { PermissionsAndroid } from 'react-native';
+import { ChatHistory } from '~/store/ChatStore';
+import DisplayMessages from '~/components/DisplayMessages';
 
 const requestMicPermission = async () => {
   if (Platform.OS === 'android') {
@@ -28,6 +32,88 @@ const requestMicPermission = async () => {
   }
   return true;
 };
+
+const messages: ChatHistory[] = [
+  {
+    userid: 'user_123',
+    role: 'user',
+    content: 'Hello, how are you today?',
+    created_at: new Date('2023-05-15T09:30:00Z'),
+    id: 'msg_001',
+  },
+  {
+    userid: 'assistant_001',
+    role: 'assistant',
+    content: "I'm doing well, thank you! How can I help you?",
+    created_at: new Date('2023-05-15T09:31:00Z'),
+    id: 'msg_002',
+    session_id: 'sess_abc123',
+  },
+  {
+    userid: 'user_123',
+    role: 'user',
+    content: 'Can you tell me about your features?',
+    created_at: new Date('2023-05-15T09:32:00Z'),
+    id: 'msg_003',
+    session_id: 'sess_abc123',
+  },
+  {
+    userid: 'assistant_001',
+    role: 'assistant',
+    content:
+      'Sure! I can answer questions, provide information, and assist with various tasks. What specifically would you like to know?',
+    created_at: new Date('2023-05-15T09:33:00Z'),
+    id: 'msg_004',
+  },
+  {
+    userid: 'user_456',
+    role: 'user',
+    content: "What's the weather like today?",
+    created_at: new Date('2023-05-16T10:15:00Z'),
+    id: 'msg_005',
+    session_id: 'sess_def456',
+  },
+  {
+    userid: 'assistant_001',
+    role: 'assistant',
+    content:
+      "I'm sorry, I don't have access to real-time weather data. You might want to check a weather service or app.",
+    created_at: new Date('2023-05-16T10:16:00Z'),
+    id: 'msg_006',
+    session_id: 'sess_def456',
+  },
+  {
+    userid: 'user_789',
+    role: 'user',
+    content: 'Thanks for your help!',
+    created_at: new Date('2023-05-17T14:22:00Z'),
+    id: 'msg_007',
+  },
+  {
+    userid: 'assistant_001',
+    role: 'assistant',
+    content: "You're welcome! Let me know if you need anything else.",
+    created_at: new Date('2023-05-17T14:23:00Z'),
+    id: 'msg_008',
+    session_id: 'sess_ghi789',
+  },
+  {
+    userid: 'user_123',
+    role: 'user',
+    content: 'How do I reset my password?',
+    created_at: new Date('2023-05-18T11:05:00Z'),
+    id: 'msg_009',
+    session_id: 'sess_jkl012',
+  },
+  {
+    userid: 'assistant_001',
+    role: 'assistant',
+    content:
+      "You can reset your password by going to the account settings page and clicking on 'Forgot Password'.",
+    created_at: new Date('2023-05-18T11:06:00Z'),
+    id: 'msg_010',
+  },
+];
 
 const AskYourAI = () => {
   const router = useRouter();
@@ -53,11 +139,21 @@ const AskYourAI = () => {
     await stopRecognizing();
   };
 
+  const handleStartListining = async () => {
+    if (await requestMicPermission()) {
+      await startRecognizing();
+    } else {
+      Alert.alert(
+        'Microphone Access denied',
+        'Allow this app to access your microphone to continue speech recognition'
+      );
+    }
+  };
+
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    requestMicPermission();
-  }, []);
+
+  const flatListRef = useRef<FlatList>(null);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -76,16 +172,16 @@ const AskYourAI = () => {
                   Your Personal AI Assistant
                 </Text>
                 {/* Chat messages go here */}
-                <Text className="flex flex-col text-xl font-bold tracking-wider ">
-                  {JSON.stringify(state)}
-                </Text>
+                {messages.map((msg, i) => (
+                  <DisplayMessages message={msg} key={i.toString()} />
+                ))}
               </View>
             </ScrollView>
 
             {/* Bottom input bar (NOT absolutely positioned anymore) */}
             <MessageInput
               handleSendMessage={handleSendMessage}
-              onPressIn={startRecognizing}
+              onPressIn={handleStartListining}
               onPressOut={handleStopRecognizing}
               message={message}
               setMessage={setMessage}
