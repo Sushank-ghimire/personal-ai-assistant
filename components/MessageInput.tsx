@@ -13,10 +13,12 @@ interface Props {
   message: string;
   setMessage: React.Dispatch<React.SetStateAction<string>>;
   handleSendMessage: () => Promise<void>;
-  handleVoiceInput: () => Promise<void>;
+  onPressIn: () => Promise<void>;
+  onPressOut: () => Promise<void>;
+  handleStopRecognizing: () => Promise<void>;
 }
 
-const MessageInput = ({ message, handleSendMessage, setMessage, handleVoiceInput }: Props) => {
+const MessageInput = ({ message, handleSendMessage, setMessage, onPressIn, onPressOut }: Props) => {
   const isSendDisabled = message.trim().length === 0;
 
   return (
@@ -27,7 +29,8 @@ const MessageInput = ({ message, handleSendMessage, setMessage, handleVoiceInput
       <View style={styles.container}>
         {/* Mic Button */}
         <TouchableOpacity
-          onPress={handleVoiceInput}
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}
           className="rounded-full bg-indigo-500 p-4 "
           style={styles.iconButton}>
           <Ionicons name="mic-outline" size={22} color={'white'} />

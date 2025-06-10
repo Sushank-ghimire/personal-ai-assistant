@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -12,26 +12,52 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MessageInput from '~/components/MessageInput';
 import useAuthStore from '~/store/AuthStore';
-import useVoiceInput from '~/hooks/useVoiceInput';
+import { useVoiceRecognition } from '~/hooks/useVoiceInput';
+import { PermissionsAndroid } from 'react-native';
+
+const requestMicPermission = async () => {
+  if (Platform.OS === 'android') {
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, {
+      title: 'Microphone Permission',
+      message: 'App needs access to your microphone to record your voice',
+      buttonNeutral: 'Ask Me Later',
+      buttonNegative: 'Cancel',
+      buttonPositive: 'OK',
+    });
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  }
+  return true;
+};
 
 const AskYourAI = () => {
   const router = useRouter();
   const { logout } = useAuthStore();
-
-  const { result, isListening, stopListening, startListening } = useVoiceInput();
 
   const handleLogout = async () => {
     await logout();
     router.push('/');
   };
 
+  const {
+    state,
+    startRecognizing,
+    stopRecognizing,
+    cancelRecognizing,
+    destryoRecognizer,
+    resetState,
+  } = useVoiceRecognition();
+
   const handleSendMessage = async () => {};
 
-  const handleVoiceInput = async () => {
-    await startListening();
+  const handleStopRecognizing = async () => {
+    await stopRecognizing();
   };
 
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    requestMicPermission();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -50,16 +76,20 @@ const AskYourAI = () => {
                   Your Personal AI Assistant
                 </Text>
                 {/* Chat messages go here */}
-                <Text>Chat Messages Goes Here</Text>
+                <Text className="flex flex-col text-xl font-bold tracking-wider ">
+                  {JSON.stringify(state)}
+                </Text>
               </View>
             </ScrollView>
 
             {/* Bottom input bar (NOT absolutely positioned anymore) */}
             <MessageInput
               handleSendMessage={handleSendMessage}
-              handleVoiceInput={handleVoiceInput}
+              onPressIn={startRecognizing}
+              onPressOut={handleStopRecognizing}
               message={message}
               setMessage={setMessage}
+              handleStopRecognizing={handleStopRecognizing}
             />
           </View>
         </TouchableWithoutFeedback>
