@@ -1,12 +1,11 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
   TouchableWithoutFeedback,
   View,
@@ -16,7 +15,7 @@ import MessageInput from '~/components/MessageInput';
 import useAuthStore from '~/store/AuthStore';
 import { useVoiceRecognition } from '~/hooks/useVoiceInput';
 import { PermissionsAndroid } from 'react-native';
-import { ChatHistory } from '~/store/ChatStore';
+import useChatStore, { ChatHistory } from '~/store/ChatStore';
 import DisplayMessages from '~/components/DisplayMessages';
 
 const requestMicPermission = async () => {
@@ -117,23 +116,67 @@ const messages: ChatHistory[] = [
 
 const AskYourAI = () => {
   const router = useRouter();
-  const { logout } = useAuthStore();
+  const { logout, session } = useAuthStore();
+  const { getChatHistory, loading, sendMessage } = useChatStore();
+
+  const [historyMessages, setHistoryMessages] = useState<ChatHistory[]>([]);
 
   const handleLogout = async () => {
     await logout();
     router.push('/');
   };
 
-  const {
-    state,
-    startRecognizing,
-    stopRecognizing,
-    cancelRecognizing,
-    destryoRecognizer,
-    resetState,
-  } = useVoiceRecognition();
+  const { startRecognizing, stopRecognizing } = useVoiceRecognition();
+  const handleSendMessage = async () => {
+    if (message.trim() === '') {
+      Alert.alert('Message cannot be empty');
+      return;
+    }
 
-  const handleSendMessage = async () => {};
+    const userMsg: ChatHistory = {
+      userid: session?.user.id!,
+      role: 'user',
+      content: message,
+      created_at: new Date(),
+      id: `local-${Date.now()}`, // temporary ID
+      session_id: undefined,
+    };
+
+    const thinkingMsg: ChatHistory = {
+      userid: 'assistant',
+      role: 'assistant',
+      content: '...',
+      created_at: new Date(),
+      id: `thinking-${Date.now()}`,
+      session_id: undefined,
+    };
+
+    // Optimistic update
+    setHistoryMessages((prev) => [...prev, userMsg, thinkingMsg]);
+    setMessage('');
+
+    try {
+      const { reply } = await sendMessage(session?.user.id!, message, null);
+
+      // Replace "..." thinking message with real reply
+      setHistoryMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === thinkingMsg.id
+            ? {
+                ...msg,
+                content: reply,
+                created_at: new Date(),
+                id: `ai-${Date.now()}`,
+              }
+            : msg
+        )
+      );
+    } catch (error) {
+      Alert.alert('Error sending message', String(error));
+      // Optionally remove the thinking message if error
+      setHistoryMessages((prev) => prev.filter((msg) => msg.id !== thinkingMsg.id));
+    }
+  };
 
   const handleStopRecognizing = async () => {
     await stopRecognizing();
@@ -159,6 +202,15 @@ const AskYourAI = () => {
     flatListRef.current?.scrollToEnd({ animated: true });
   }, [messages.length]);
 
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const messages = await getChatHistory(session?.user.id!, null);
+      setHistoryMessages(messages);
+    };
+
+    if (session?.user.id) fetchHistory();
+  }, [session?.user.id]);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <KeyboardAvoidingView
@@ -169,7 +221,7 @@ const AskYourAI = () => {
           <View style={{ flex: 1 }}>
             <FlatList
               ref={flatListRef}
-              data={messages}
+              data={historyMessages}
               ListHeaderComponent={
                 <View style={{ flex: 1 }}>
                   <View className="px-4 pt-2">

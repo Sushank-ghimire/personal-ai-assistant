@@ -1,5 +1,6 @@
 import { View, Text } from 'react-native';
 import { ChatHistory } from '~/store/ChatStore';
+import TypingIndicator from './TypingIndicator';
 
 interface IDisplayMessagesProps {
   message: ChatHistory;
@@ -28,7 +29,7 @@ const DisplayMessages = ({ message }: IDisplayMessagesProps) => {
           isUser ? 'rounded-tr-md bg-blue-500' : 'rounded-tl-md bg-gray-100'
         }`}>
         <Text className={`text-base leading-5 ${isUser ? 'text-white' : 'text-gray-800'}`}>
-          {message.content}
+          {message.content === '...' ? <TypingIndicator /> : <Text>{message.content}</Text>}
         </Text>
         <Text className={`mt-1 text-xs ${isUser ? 'text-blue-100' : 'text-gray-500'}`}>
           {formattedTime}
