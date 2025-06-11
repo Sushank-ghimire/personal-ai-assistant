@@ -16,7 +16,7 @@ import { useRouter } from 'expo-router';
 import { Button } from '~/components/Button';
 
 const LoginScreen = () => {
-  const { login, session } = useAuthStore();
+  const { login, session, logout } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -67,6 +67,24 @@ const LoginScreen = () => {
     }
   };
 
+  const handleLogout = async () => {
+    Alert.alert('Session delete ?', 'Are you sure want to logout ?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Yes',
+        onPress: async () => {
+          await logout();
+          router.push('/');
+        },
+        style: 'destructive',
+      },
+    ]);
+    router.push('/');
+  };
+
   if (session?.user) {
     return (
       <View className="flex min-h-screen w-screen items-center justify-center px-12">
@@ -77,6 +95,11 @@ const LoginScreen = () => {
           }}
           className="w-full rounded-sm p-2 text-xl"
           title="Chat With your AI Assistant"
+        />
+        <Button
+          onPress={handleLogout}
+          className="mt-4 w-full rounded-sm bg-red-500 p-2 text-xl"
+          title="Logout"
         />
       </View>
     );
