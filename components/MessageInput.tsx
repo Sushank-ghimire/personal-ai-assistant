@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   TextInput,
   TouchableOpacity,
+  StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
 } from 'react-native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 
@@ -19,26 +19,40 @@ interface Props {
   loading: boolean;
 }
 
-const MessageInput = ({ message, handleSendMessage, setMessage, onPressIn, onPressOut, loading }: Props) => {
+const MessageInput = ({
+  message,
+  handleSendMessage,
+  setMessage,
+  onPressIn,
+  onPressOut,
+  loading,
+}: Props) => {
+  const inputRef = useRef<TextInput>(null);
   const isSendDisabled = message.trim().length === 0;
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={90}
-      style={styles.keyboardAvoidingContainer}>
+      style={[
+        styles.keyboardAvoidingView,
+        isFocused && { marginBottom: 308 }, // push it up when focused
+      ]}>
       <View style={styles.container}>
         {/* Mic Button */}
         <TouchableOpacity
           onPressIn={onPressIn}
           onPressOut={onPressOut}
-          className="rounded-full bg-indigo-500 p-4 "
-          style={styles.iconButton}>
+          style={[styles.iconButton, { backgroundColor: '#6366f1' }]}>
           <Ionicons name="mic-outline" size={22} color={'white'} />
         </TouchableOpacity>
 
         {/* Message Input */}
         <TextInput
+          ref={inputRef}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           multiline
           value={message}
           onChangeText={setMessage}
@@ -51,16 +65,8 @@ const MessageInput = ({ message, handleSendMessage, setMessage, onPressIn, onPre
         <TouchableOpacity
           onPress={handleSendMessage}
           disabled={isSendDisabled || loading}
-          style={[
-            styles.sendButton,
-            { backgroundColor: isSendDisabled ? '#a5b4fc' : '#4f46e5' }, // gray-300 or indigo-600
-          ]}>
-          <AntDesign
-            name="arrowup"
-            className="font-bold"
-            size={16}
-            color={isSendDisabled ? '#ffffff' : '#ffffff'}
-          />
+          style={[styles.sendButton, { backgroundColor: isSendDisabled ? '#a5b4fc' : '#4f46e5' }]}>
+          <AntDesign name="arrowup" size={16} color="#ffffff" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -70,7 +76,7 @@ const MessageInput = ({ message, handleSendMessage, setMessage, onPressIn, onPre
 export default MessageInput;
 
 const styles = StyleSheet.create({
-  keyboardAvoidingContainer: {
+  keyboardAvoidingView: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
@@ -81,7 +87,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderColor: '#e5e7eb', // Tailwind gray-200
+    borderColor: '#e5e7eb',
     backgroundColor: 'white',
   },
   input: {
@@ -98,7 +104,8 @@ const styles = StyleSheet.create({
     maxHeight: 120,
   },
   iconButton: {
-    padding: 6,
+    padding: 10,
+    borderRadius: 50,
   },
   sendButton: {
     padding: 10,

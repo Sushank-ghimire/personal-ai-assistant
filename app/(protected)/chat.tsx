@@ -1,15 +1,5 @@
-import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Alert,
-  FlatList,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, FlatList, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MessageInput from '~/components/MessageInput';
 import useAuthStore from '~/store/AuthStore';
@@ -33,16 +23,10 @@ const requestMicPermission = async () => {
 };
 
 const AskYourAI = () => {
-  const router = useRouter();
-  const { logout, session } = useAuthStore();
+  const { session } = useAuthStore();
   const { getChatHistory, loading, sendMessage } = useChatStore();
 
   const [historyMessages, setHistoryMessages] = useState<ChatHistory[]>([]);
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/');
-  };
 
   const { startRecognizing, stopRecognizing } = useVoiceRecognition();
   const handleSendMessage = async () => {
@@ -75,8 +59,6 @@ const AskYourAI = () => {
 
     try {
       const { reply } = await sendMessage(session?.user.id!, message, null);
-
-      // Replace "..." thinking message with real reply
       setHistoryMessages((prev) =>
         prev.map((msg) =>
           msg.id === thinkingMsg.id
@@ -133,42 +115,52 @@ const AskYourAI = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}>
-        <TouchableWithoutFeedback>
-          <View style={{ flex: 1 }}>
-            <FlatList
-              ref={flatListRef}
-              data={historyMessages}
-              ListHeaderComponent={
-                <View style={{ flex: 1 }}>
-                  <View className="px-4 pt-2">
-                    <Text className="mb-2 text-4xl font-bold tracking-wider text-indigo-500">
-                      Your Personal AI Assistant
-                    </Text>
-                  </View>
+        <View style={{ flex: 1 }}>
+          <FlatList
+            ref={flatListRef}
+            data={historyMessages}
+            automaticallyAdjustKeyboardInsets={true}
+            ListHeaderComponent={
+              <View style={{ flex: 1 }}>
+                <View className="px-4 pt-2">
+                  <Text className="mb-2 text-4xl font-bold tracking-wider text-indigo-500">
+                    Your Personal AI Assistant
+                  </Text>
                 </View>
-              }
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => <DisplayMessages message={item} />}
-              contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 100 }}
-              onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-            />
+              </View>
+            }
+            ListEmptyComponent={
+              <View style={{ paddingTop: 100, alignItems: 'center' }}>
+                <Text style={{ color: '#9ca3af', fontSize: 16 }}>
+                  No messages yet. Start the conversation!
+                </Text>
+              </View>
+            }
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <DisplayMessages message={item} />}
+            contentContainerStyle={{
+              paddingHorizontal: 12,
+              paddingBottom: 360, // Reduced padding since input will push content up
+            }}
+            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+            showsVerticalScrollIndicator={false}
+            keyboardDismissMode="interactive"
+            keyboardShouldPersistTaps="handled"
+          />
 
-            {/* Bottom input bar (NOT absolutely positioned anymore) */}
-            <MessageInput
-              handleSendMessage={handleSendMessage}
-              onPressIn={handleStartListining}
-              onPressOut={handleStopRecognizing}
-              message={message}
-              loading={loading}
-              setMessage={setMessage}
-              handleStopRecognizing={handleStopRecognizing}
-            />
-          </View>
-        </TouchableWithoutFeedback>
+          {/* Message input now flows naturally in the layout */}
+          <MessageInput
+            handleSendMessage={handleSendMessage}
+            onPressIn={handleStartListining}
+            onPressOut={handleStopRecognizing}
+            message={message}
+            loading={loading}
+            setMessage={setMessage}
+            handleStopRecognizing={handleStopRecognizing}
+          />
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

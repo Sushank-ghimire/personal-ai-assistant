@@ -25,10 +25,10 @@ const LoginScreen = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (session?.user) {
+    if (session?.user.id) {
       router.push('/chat');
     }
-  }, [router, session]);
+  }, [session?.user.id]);
 
   const handleOAuthLogin = async (provider: 'google' | 'github') => {
     Alert.alert('Currently not available updating as soon as possible');
@@ -91,7 +91,7 @@ const LoginScreen = () => {
         <Text className="mb-10 text-center text-4xl font-bold text-indigo-600">Welcome Back</Text>
         <Button
           onPress={() => {
-            router.push('/chat');
+            router.prefetch('/chat');
           }}
           className="w-full rounded-sm p-2 text-xl"
           title="Chat With your AI Assistant"
