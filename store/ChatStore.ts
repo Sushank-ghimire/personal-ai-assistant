@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '~/utils/supabase';
-import OpenAI from 'openai';
+import openai from '~/utils/openai';
 
 export interface ChatHistory {
   userid: string;
@@ -10,11 +10,6 @@ export interface ChatHistory {
   id: string;
   session_id?: string;
 }
-
-const openai = new OpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.AI_API_KEY,
-});
 
 interface AiChatStore {
   sendMessage: (
