@@ -152,8 +152,12 @@ const AskYourAI = () => {
 
   const [message, setMessage] = useState('');
 
-
   const flatListRef = useRef<FlatList>(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    flatListRef.current?.scrollToEnd({ animated: true });
+  }, [messages.length]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -163,20 +167,25 @@ const AskYourAI = () => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={{ flex: 1 }}>
-            <ScrollView
-              contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: 90 }}
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              ListHeaderComponent={
+                <View style={{ flex: 1 }}>
+                  <View className="px-4 pt-2">
+                    <Text className="mb-2 text-4xl font-bold tracking-wider text-indigo-500">
+                      Your Personal AI Assistant
+                    </Text>
+                  </View>
+                </View>
+              }
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => <DisplayMessages message={item} />}
+              contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 100 }}
+              onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+              showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}>
-              <View>
-                <Text className="text-4xl font-bold tracking-wider text-indigo-500">
-                  Your Personal AI Assistant
-                </Text>
-                {/* Chat messages go here */}
-                {messages.map((msg, i) => (
-                  <DisplayMessages message={msg} key={i.toString()} />
-                ))}
-              </View>
-            </ScrollView>
+            />
 
             {/* Bottom input bar (NOT absolutely positioned anymore) */}
             <MessageInput
