@@ -16,9 +16,10 @@ interface Props {
   onPressIn: () => Promise<void>;
   onPressOut: () => Promise<void>;
   handleStopRecognizing: () => Promise<void>;
+  loading: boolean;
 }
 
-const MessageInput = ({ message, handleSendMessage, setMessage, onPressIn, onPressOut }: Props) => {
+const MessageInput = ({ message, handleSendMessage, setMessage, onPressIn, onPressOut, loading }: Props) => {
   const isSendDisabled = message.trim().length === 0;
 
   return (
@@ -49,7 +50,7 @@ const MessageInput = ({ message, handleSendMessage, setMessage, onPressIn, onPre
         {/* Send Button */}
         <TouchableOpacity
           onPress={handleSendMessage}
-          disabled={isSendDisabled}
+          disabled={isSendDisabled || loading}
           style={[
             styles.sendButton,
             { backgroundColor: isSendDisabled ? '#a5b4fc' : '#4f46e5' }, // gray-300 or indigo-600

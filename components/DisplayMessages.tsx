@@ -1,6 +1,7 @@
 import { View, Text } from 'react-native';
 import { ChatHistory } from '~/store/ChatStore';
 import TypingIndicator from './TypingIndicator';
+import MarkdownViewer from './MarkdownViewer';
 
 interface IDisplayMessagesProps {
   message: ChatHistory;
@@ -25,11 +26,17 @@ const DisplayMessages = ({ message }: IDisplayMessagesProps) => {
   return (
     <View className={`w-full flex-row px-3 py-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
       <View
-        className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
+        className={`max-w-[90%] rounded-2xl px-4 py-3 shadow-sm ${
           isUser ? 'rounded-tr-md bg-blue-500' : 'rounded-tl-md bg-gray-100'
         }`}>
         <Text className={`text-base leading-5 ${isUser ? 'text-white' : 'text-gray-800'}`}>
-          {message.content === '...' ? <TypingIndicator /> : <Text>{message.content}</Text>}
+          {message.content === '...' ? (
+            <TypingIndicator />
+          ) : isUser ? (
+            <Text className="text-base leading-5 text-white">{message.content}</Text>
+          ) : (
+            <MarkdownViewer content={message.content} />
+          )}
         </Text>
         <Text className={`mt-1 text-xs ${isUser ? 'text-blue-100' : 'text-gray-500'}`}>
           {formattedTime}

@@ -32,88 +32,6 @@ const requestMicPermission = async () => {
   return true;
 };
 
-const messages: ChatHistory[] = [
-  {
-    userid: 'user_123',
-    role: 'user',
-    content: 'Hello, how are you today?',
-    created_at: new Date('2023-05-15T09:30:00Z'),
-    id: 'msg_001',
-  },
-  {
-    userid: 'assistant_001',
-    role: 'assistant',
-    content: "I'm doing well, thank you! How can I help you?",
-    created_at: new Date('2023-05-15T09:31:00Z'),
-    id: 'msg_002',
-    session_id: 'sess_abc123',
-  },
-  {
-    userid: 'user_123',
-    role: 'user',
-    content: 'Can you tell me about your features?',
-    created_at: new Date('2023-05-15T09:32:00Z'),
-    id: 'msg_003',
-    session_id: 'sess_abc123',
-  },
-  {
-    userid: 'assistant_001',
-    role: 'assistant',
-    content:
-      'Sure! I can answer questions, provide information, and assist with various tasks. What specifically would you like to know?',
-    created_at: new Date('2023-05-15T09:33:00Z'),
-    id: 'msg_004',
-  },
-  {
-    userid: 'user_456',
-    role: 'user',
-    content: "What's the weather like today?",
-    created_at: new Date('2023-05-16T10:15:00Z'),
-    id: 'msg_005',
-    session_id: 'sess_def456',
-  },
-  {
-    userid: 'assistant_001',
-    role: 'assistant',
-    content:
-      "I'm sorry, I don't have access to real-time weather data. You might want to check a weather service or app.",
-    created_at: new Date('2023-05-16T10:16:00Z'),
-    id: 'msg_006',
-    session_id: 'sess_def456',
-  },
-  {
-    userid: 'user_789',
-    role: 'user',
-    content: 'Thanks for your help!',
-    created_at: new Date('2023-05-17T14:22:00Z'),
-    id: 'msg_007',
-  },
-  {
-    userid: 'assistant_001',
-    role: 'assistant',
-    content: "You're welcome! Let me know if you need anything else.",
-    created_at: new Date('2023-05-17T14:23:00Z'),
-    id: 'msg_008',
-    session_id: 'sess_ghi789',
-  },
-  {
-    userid: 'user_123',
-    role: 'user',
-    content: 'How do I reset my password?',
-    created_at: new Date('2023-05-18T11:05:00Z'),
-    id: 'msg_009',
-    session_id: 'sess_jkl012',
-  },
-  {
-    userid: 'assistant_001',
-    role: 'assistant',
-    content:
-      "You can reset your password by going to the account settings page and clicking on 'Forgot Password'.",
-    created_at: new Date('2023-05-18T11:06:00Z'),
-    id: 'msg_010',
-  },
-];
-
 const AskYourAI = () => {
   const router = useRouter();
   const { logout, session } = useAuthStore();
@@ -200,7 +118,7 @@ const AskYourAI = () => {
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     flatListRef.current?.scrollToEnd({ animated: true });
-  }, [messages.length]);
+  }, [historyMessages.length]);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -217,7 +135,7 @@ const AskYourAI = () => {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <TouchableWithoutFeedback>
           <View style={{ flex: 1 }}>
             <FlatList
               ref={flatListRef}
@@ -245,6 +163,7 @@ const AskYourAI = () => {
               onPressIn={handleStartListining}
               onPressOut={handleStopRecognizing}
               message={message}
+              loading={loading}
               setMessage={setMessage}
               handleStopRecognizing={handleStopRecognizing}
             />
