@@ -45,7 +45,6 @@ const useChatStore = create<AiChatStore>((set) => ({
         ],
       });
       const reply = response.choices[0].message.content;
-      console.log(reply);
       const { error: aiError } = await supabase.from('conversations').insert({
         user_id: userid,
         role: 'assistant',
