@@ -15,17 +15,14 @@ A cross-platform voice-enabled AI assistant built with **React Native**. It supp
 
 ## 📱 Screenshots
 
-### 🏠 Homepage
+<h3>🏠 Homepage</h3>
+<img src="./assets/screenshots/homepage.jpg" width="400"/>
 
-![Homepage](./assets/screenshots/homepage.jpg)
+<h3>🔐 Login Page</h3>
+<img src="./assets/screenshots/loginpage.jpg" width="400"/>
 
-### 🔐 Login Page
-
-![Login](./assets/screenshots/loginpage.jpg)
-
-### 📝 Signup Page
-
-## ![Signup](./assets/screenshots/signup.jpg)
+<h3>📝 Signup Page</h3>
+<img src="./assets/screenshots/signup.jpg" width="400"/>
 
 ## ⚙️ Tech Stack
 
