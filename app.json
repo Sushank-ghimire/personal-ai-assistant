@@ -25,7 +25,11 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ghimiresushank.personalaiassistant",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -33,6 +37,13 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.ghimiresushank.personalaiassistant"
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "53b2457c-d8ba-4a51-82eb-27257e6ea6ec"
+      }
+    },
+    "owner": "ghimiresushank"
   }
 }

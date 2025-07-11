@@ -20,6 +20,7 @@
     "expo": "^53.0.10",
     "expo-auth-session": "~6.2.0",
     "expo-constants": "~17.1.4",
+    "expo-dev-client": "~5.2.4",
     "expo-linking": "~7.1.4",
     "expo-permissions": "^14.4.0",
     "expo-router": "~5.0.3",
